@@ -21,16 +21,41 @@ The key idea: time is a scarce resource, and optimal recommendations should refl
 This repo is intentionally compact and easy to modify for research experiments.
 
 ---
+## Installation
+python -m venv .venv
+source .venv/bin/activate
+pip install -e .
+---
+## Train
+python -m bcrl.train_dqn \
+  --total-steps 50000 \
+  --time-budget 10 \
+  --horizon 20 \
+  --n-items 100
 
-## Repo layout
+## Evaluate
+python -m bcrl.evaluate \
+  --checkpoint checkpoints/dqn_latest.pt \
+  --episodes 200 \
+  --time-budget 10 \
+  --horizon 20 \
+  --n-items 100
 
-```text
-src/bcrl/
-  agents/         # DQN
-  data/           # dataset builder (users/items/time_costs/W)
-  envs/           # time-budgeted environment
-  models/         # MLP
-  utils/          # replay buffer + epsilon schedule
-  train_dqn.py    # training CLI
-  evaluate.py     # evaluation CLI
-tests/            # smoke tests
+## Example learning curve
+
+Over the first ~10k steps, the agent behaves near-randomly (high ε), then:
+
+Learns to avoid invalid actions almost entirely
+
+Increases average return steadily
+
+Stabilizes after ~35k steps
+
+Typical final behavior:
+
+Uses ~80–90% of the time budget per episode
+
+Selects a mix of “high-value expensive” items and “medium-value cheap” items
+
+
+
